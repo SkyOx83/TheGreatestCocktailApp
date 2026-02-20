@@ -12,27 +12,66 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import fr.isen.azzopardi.thegreatestcocktailapp.DrinksActivity
+import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.CategoryListResponse
+import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.CocktailResponse
+import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.Drink
+import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.DrinkCategory
+import fr.isen.azzopardi.thegreatestcocktailapp.models.AppBarState
 import fr.isen.azzopardi.thegreatestcocktailapp.models.Category
+import fr.isen.azzopardi.thegreatestcocktailapp.network.ApiClient
+import retrofit2.Call
+import retrofit2.Response
 
 @Composable
-fun CategoriesScreen(modifier: Modifier) {
+fun CategoriesScreen(modifier: Modifier, onComposing: (AppBarState) -> Unit) {
+
     val context = LocalContext.current
-    LazyColumn(modifier
-        .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(Category.allObjects()){ category ->
-            Card(Modifier.clickable {
-                val intent = Intent(context, DrinksActivity::class.java)
-                context.startActivity(intent)
-            }) {
-                Text("${category}",
-                    Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth())
+    var drinkCategories = remember { mutableStateOf<List<DrinkCategory>?>(null) }
+
+    LaunchedEffect(Unit) {
+        onComposing(
+            AppBarState("Categories")
+        )
+        val call = ApiClient.retrofit.getCategories()
+        call.enqueue(object : retrofit2.Callback<CategoryListResponse> {
+            override fun onResponse(
+                call: Call<CategoryListResponse>,
+                response: Response<CategoryListResponse?>?
+            ) {
+                drinkCategories.value = response?.body()?.drinks
+            }
+
+            override fun onFailure(call: Call<CategoryListResponse?>?, t: Throwable?) {
+                Log.e("request", "getCategoryList failed ${t?.message}")
+            }
+        })
+    }
+    drinkCategories.value?.let { list ->
+        LazyColumn(
+            modifier
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(list) { category ->
+                Card(Modifier.clickable {
+                    val intent = Intent(context, DrinksActivity::class.java)
+                    intent.putExtra(DrinksActivity.CATEGORY, category.strCategory)
+                    context.startActivity(intent)
+                }) {
+                    Text(
+                        "${category.strCategory}",
+                        Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
     }

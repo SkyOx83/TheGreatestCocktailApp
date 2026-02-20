@@ -3,6 +3,7 @@ package fr.isen.azzopardi.thegreatestcocktailapp
 
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -33,9 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import fr.isen.azzopardi.thegreatestcocktailapp.models.AppBarState
 import fr.isen.azzopardi.thegreatestcocktailapp.screens.BottomAppBar
 import fr.isen.azzopardi.thegreatestcocktailapp.screens.CategoriesScreen
-import fr.isen.azzopardi.thegreatestcocktailapp.screens.DetailCocktailScreen
+import fr.isen.azzopardi.thegreatestcocktailapp.screens.RandomCocktailScreen
 import fr.isen.azzopardi.thegreatestcocktailapp.screens.FavoritesScreen
 import fr.isen.azzopardi.thegreatestcocktailapp.ui.theme.TheGreatestCocktailAppTheme
 
@@ -53,6 +57,8 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val navController = rememberNavController()
 
+            val appBarState = remember { mutableStateOf(AppBarState()) }
+
             val randomItem = TabBarItem(stringResource(R.string.tab_item_random), Icons.Filled.Home, Icons.Outlined.Home)
             val categoryItem = TabBarItem(stringResource(R.string.tab_item_category), Icons.Filled.Menu, Icons.Outlined.Menu)
             val favoriteItem = TabBarItem(stringResource(R.string.tab_item_favorite), Icons.Filled.Favorite, Icons.Outlined.Favorite)
@@ -61,18 +67,20 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
                         TopAppBar({
-                            Text("Detail")
+                            Text(appBarState.value.title)
                         }, actions = {
-                            IconButton({
-                                Toast
-                                    .makeText(context, "Add to favorite", Toast.LENGTH_LONG)
-                                    .show()
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.FavoriteBorder,
-                                    contentDescription = "Localized description"
-                                )
-                            }
+//                            IconButton({
+//                                Toast
+//                                    .makeText(context, "Add to favorite", Toast.LENGTH_LONG)
+//                                    .show()
+//                            }) {
+//                                Icon(
+//                                    imageVector = Icons.Filled.FavoriteBorder,
+//                                    contentDescription = "Localized description"
+//                                )
+//                            }
+                            appBarState.value.actions?.invoke(this)
+
                         })
                     },
                     bottomBar = { BottomAppBar(tabItems, navController) }
@@ -83,24 +91,58 @@ class MainActivity : ComponentActivity() {
 //                    )
                     NavHost(navController, startDestination = randomItem.title) {
                         composable(randomItem.title) {
-                            DetailCocktailScreen(
-                                Modifier.padding(innerPadding)
+                            RandomCocktailScreen(
+                                Modifier.padding(innerPadding),
+                                { topBar ->
+                                    appBarState.value = topBar
+                                }
                             )
                         }
                         composable(categoryItem.title) {
                             CategoriesScreen(
-                                Modifier.padding(innerPadding)
+                                Modifier.padding(innerPadding),
+                                { topBar ->
+                                    appBarState.value = topBar
+                                }
                             )
                         }
                         composable(favoriteItem.title) {
                             FavoritesScreen(
-                                Modifier.padding(innerPadding)
+                                Modifier.padding(innerPadding),
+                                { topBar ->
+                                    appBarState.value = topBar
+                                }
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("Life Cycle", "Main Activity Destroy")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d("Life Cycle", "Main Activity Restart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Life Cycle", "Main Activity Resume")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("Life Cycle", "Main Activity Stop")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("Life Cycle", "Main Activity Pause")
     }
 }
 
