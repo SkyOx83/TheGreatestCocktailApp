@@ -58,58 +58,58 @@ enum class Category {
         fun colors(category: Category): List<Color> {
             return when(category) {
                 ALCOHOLIC -> listOf(
-                    colorResource(R.color.orange_200),
-                    colorResource(R.color.orange_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
 
                 NON_ALCOHOLIC -> listOf(
-                    colorResource(R.color.orange_200),
-                    colorResource(R.color.orange_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
 
                 OTHER -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 BEER -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 COCKTAIL -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 COCOA -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 COFFE -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 LIQUOR -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 DRINK -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 PUNCH -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 SHAKE -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 SHOT -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
                 SOFT -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.chip_category_start),
+                    colorResource(R.color.chip_category_end)
                 )
             }
         }

@@ -1,25 +1,28 @@
 package fr.isen.azzopardi.thegreatestcocktailapp.screens
 
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,7 @@ import coil3.compose.AsyncImage
 import fr.isen.azzopardi.thegreatestcocktailapp.R
 import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.CocktailResponse
 import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.Drink
+import fr.isen.azzopardi.thegreatestcocktailapp.managers.FavoriteManager
 import fr.isen.azzopardi.thegreatestcocktailapp.models.AppBarState
 import fr.isen.azzopardi.thegreatestcocktailapp.models.Category
 import fr.isen.azzopardi.thegreatestcocktailapp.network.ApiClient
@@ -85,10 +88,14 @@ fun RandomCocktailScreen(modifier: Modifier, onComposing: (AppBarState) -> Unit)
 }
 
 @Composable
-fun DetailCocktailScreen(drinkId: String, modifier: Modifier) {
+fun DetailCocktailScreen(drinkId: String,onComposing: (AppBarState) -> Unit, modifier: Modifier) {
     var drink = remember { mutableStateOf<Drink?>(null) }
 
     LaunchedEffect(Unit) {
+        onComposing (
+            AppBarState("Cocktail Details",
+                actions = { DetailCocktailTopButton(drink.value) })
+        )
 //        drink.value = ApiClient.retrofit.getRandom().drinks?.first()
         val call = ApiClient.retrofit.getDetailCocktail(drinkId)
         call.enqueue(object : retrofit2.Callback<CocktailResponse> {
@@ -129,8 +136,7 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
     ) {
 
         Column(
-            modifier = modifier.fillMaxWidth()
-                .padding(8.dp)
+            modifier = modifier.fillMaxSize()
                 .verticalScroll(state = rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -148,7 +154,7 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
                         .clip(CircleShape)
                         .border(
                             width = 1.dp,
-                            colorResource(R.color.Circle),
+                            colorResource(R.color.circle_border),
                             CircleShape
                         )
                 )
@@ -169,8 +175,8 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
                     .shadow(50.dp, shape = RoundedCornerShape(10.dp))
                     .background(
                         brush = Brush.verticalGradient(listOf(
-                            colorResource(R.color.teal_200),
-                            colorResource(R.color.teal_700)
+                            colorResource(R.color.chip_category_start),
+                            colorResource(R.color.chip_category_end)
                         ))
                     )
                 ) {
@@ -187,8 +193,8 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
                     .shadow(50.dp, shape = RoundedCornerShape(10.dp))
                     .background(
                         brush = Brush.verticalGradient(listOf(
-                            colorResource(R.color.orange_200),
-                            colorResource(R.color.orange_700)
+                            colorResource(R.color.chip_alcoholic_start),
+                            colorResource(R.color.chip_alcoholic_end)
                         ))
                     )
                 ) {
@@ -201,45 +207,122 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
                 }
             }
             Text(text = drink.strGlass.toString())
-            Card() {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                elevation = CardDefaults.cardElevation(8.dp)
+            ) {
                 Column(
-                    Modifier.padding(8.dp)
-                        .fillMaxWidth()) {
-                    Text(stringResource(R.string.ingrendient),
-                        style = MaterialTheme.typography.titleMedium)
+                    modifier = Modifier.padding(20.dp)
+                ) {
+
+                    Text(
+                        text = "Ingredients",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF00897B)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     drink.ingredientList().forEach { (ingredient, measure) ->
-                        Row {
-                            Text(text = "• ")
-                            Text(text = "$ingredient $measure")
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(vertical = 6.dp)
+                        ) {
+
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(
+                                        Color(0xFFFF9800),
+                                        CircleShape
+                                    )
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Text(
+                                text = ingredient,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp
+                            )
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            Text(
+                                text = measure,
+                                color = Color.Gray,
+                                fontSize = 14.sp
+                            )
                         }
                     }
                 }
             }
-            Card() {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                elevation = CardDefaults.cardElevation(8.dp)
+            ) {
                 Column(
-                    Modifier.padding(16.dp)
-                        .fillMaxWidth()) {
-                    Text(stringResource(R.string.preparation),
-                        style = MaterialTheme.typography.titleMedium)
-                    Text(text = drink.strInstructionsFR.toString())
+                    modifier = Modifier.padding(20.dp)
+                ) {
+
+                    Text(
+                        text = "Preparation",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFEF6C00)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = drink.strInstructionsFR ?: drink.strInstructions ?: "",
+                        fontSize = 16.sp,
+                        lineHeight = 22.sp,
+                        color = Color.DarkGray
+                    )
                 }
             }
         }
     }
 }
 
+
 @Composable
 fun DetailCocktailTopButton(drink: Drink?) {
     val context = LocalContext.current
-    IconButton({
-        Toast
-            .makeText(context, "Add to favorite", Toast.LENGTH_LONG)
-            .show()
-    }) {
-        Icon(
-            imageVector = Icons.Filled.FavoriteBorder,
-            contentDescription = "Localized description"
-        )
+    val favoritesManager = FavoriteManager()
+    drink?.let { drink ->
+        var isFavorites = remember {
+            mutableStateOf<Boolean>(favoritesManager.isFavorite(drink, context))
+        }
+
+        IconButton({
+            favoritesManager.toggleFavorite(drink, context)
+            isFavorites.value = favoritesManager.isFavorite(drink, context)
+        }) {
+            Icon(
+                imageVector = if (isFavorites.value) {
+                    Icons.Filled.Favorite
+                } else {
+                    Icons.Filled.FavoriteBorder
+                },
+                contentDescription = "Localized description"
+            )
+        }
     }
 }
 

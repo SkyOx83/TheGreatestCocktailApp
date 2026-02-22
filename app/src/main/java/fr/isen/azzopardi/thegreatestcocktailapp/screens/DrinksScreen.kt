@@ -27,17 +27,21 @@ import fr.isen.azzopardi.thegreatestcocktailapp.DetailCocktailActivity
 import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.CocktailResponse
 import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.DrinkFilterResponse
 import fr.isen.azzopardi.thegreatestcocktailapp.dataClasses.DrinkPreview
+import fr.isen.azzopardi.thegreatestcocktailapp.models.AppBarState
 import fr.isen.azzopardi.thegreatestcocktailapp.network.ApiClient
 import retrofit2.Call
 import retrofit2.Response
 
 @Composable
-fun DrinksScreen(modifier: Modifier, category: String) {
+fun DrinksScreen(modifier: Modifier, category: String,onComposing: (AppBarState) -> Unit) {
 
     val drinks = remember { mutableStateOf<List<DrinkPreview>?>(null) }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        onComposing (
+            AppBarState("Cocktails Preview")
+        )
         val call = ApiClient.retrofit.getDrinksPreview(category)
         call.enqueue(object: retrofit2.Callback<DrinkFilterResponse> {
             override fun onResponse(

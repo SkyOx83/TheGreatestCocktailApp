@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
             val favoriteItem = TabBarItem(stringResource(R.string.tab_item_favorite), Icons.Filled.Favorite, Icons.Outlined.Favorite)
             val tabItems = listOf(randomItem, categoryItem, favoriteItem)
             TheGreatestCocktailAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize(),
+                Scaffold(
                     topBar = {
                         TopAppBar({
                             Text(appBarState.value.title)
@@ -83,6 +83,7 @@ class MainActivity : ComponentActivity() {
 
                         })
                     },
+                    modifier = Modifier.fillMaxSize(),
                     bottomBar = { BottomAppBar(tabItems, navController) }
                 ) { innerPadding ->
 //                    Greeting(
